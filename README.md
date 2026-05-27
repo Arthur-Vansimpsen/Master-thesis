@@ -1,36 +1,95 @@
-# Master-thesis
+# Censored Data Simulation for SPC and CUSUM Performance Evaluation
 
-Moving CUSUM Window for category FC026 (Minced meat plain) 
+This repository contains an R-based simulation framework for evaluating statistical methods for censored data in the context of Statistical Process Control (SPC), with a focus on Phase I estimation and Phase II CUSUM monitoring.
 
-- Important tests in this category are the following:
+## Overview
 
- Counts:
-  +   Aerobe mesophile Koloniezahl_KbE/g
-  +   Enterobacteriaceae_KbE/g
-  +   Listeria spp._Nachweis
-  +   Escherichia coli_KbE/g
-  +   Koagulase-positive Staphylokokken_KbE/g
-  +   Milchsäurebakterien_KbE/g
-  +   Hefen_KbE/g
-  +   Listeria spp._KbE/g
-  +   Listeria monocytogenes_KbE/g
-  +   Präsumtive Pseudomonas_KbE/g
-  
- Attribute (presence/absence):  
-  +   Thermophile Campylobacter_Nachweis
-  +   Listeria monocytogenes_Nachweis
-  +   Salmonella_Nachweis
+The simulation study compares different approaches for handling left-censored data, commonly encountered in food safety and environmental microbiology datasets where values fall below a limit of detection (LOD).
 
-- Function analyze_critical_day performs the following steps:
-  1. Filter data for the specified customer, product, and indicator.
-  2. Identify the first and last observation of the target day.
-  3. Define baseline (observations 250 till 50 before target day) and monitoring periods (observations 50 till last observation target date).
-  4. Perform Phase I outlier removal on the baseline data using individual Shewhart chart with a 3-sigma limit.
-  5. Compute final control limits from the cleaned baseline.
-  6. Apply  individual Shewhart chart and CUSUM to the monitoring data with the final limits and specified se_shift.
-  7. Identify critical points in the monitoring data where the indicator exceeds the critical value (M).
-  8. Plot the CUSUM chart and highlight critical points in green and points from the target day in red.
-  Comment: change plot = TRUE to false if you don't want to see the plots.
+The main objective is to assess how different estimation and imputation strategies affect:
 
-- function run_backtest_daily runs the analyze_critical_day function for each day with available data for the specified customer and product, and compiles a performance table summarizing the results.
-  output: Gives for every day the number of points above the traditional M limit (green colored), if they are above the CUSUM limit and how many censequent previous points are above the CUSUM limit (early warning)
+- Phase I estimation of process parameters (mean and standard deviation)
+- Phase II CUSUM chart performance
+- Detection performance under varying censoring levels and process shifts
+
+## Methods Compared
+
+The following approaches are evaluated:
+
+### Phase I estimation
+- Maximum Likelihood Estimation (MLE) via censored Gaussian model (`survreg`)
+- Regression on Order Statistics (ROS) using the `NADA` package
+
+### Phase II imputation / monitoring methods
+- LOD substitution
+- LOD / √2 substitution
+- Stochastic Random Imputation (truncated normal approach)
+- Likelihood-based CUSUM (no imputation required)
+
+## Simulation Design
+
+- Data are generated from a normal distribution with left censoring at a fixed LOD
+- Censoring levels range from very low (≈0%) to 95%
+- Sample size per simulation:
+  - Phase I: 200 observations
+  - Phase II (in-control): 25 observations
+  - Phase II (post-shift): 3000 observations
+- Process shifts:
+  - 0σ (in-control)
+  - 0.5σ shift
+  - 1σ shift
+- Number of simulations: 200 per scenario
+
+The mean is adjusted according to censoring proportion to maintain consistent censoring levels across scenarios.
+
+## CUSUM Implementation
+
+- Standard CUSUM is implemented using the `qcr` package
+- Likelihood-based CUSUM is implemented using log-likelihood ratios for censored and uncensored observations
+- Performance is evaluated using:
+  - Average Run Length (ARL)
+  - Median run length
+  - Standard deviation of run length (SDRL)
+  - Quantiles (10%, 25%, 75%, 90%)
+
+## Output
+
+The script produces:
+
+- Simulation results for all combinations of:
+  - censoring level
+  - method
+  - process shift
+- Summary performance metrics (ARL, quantiles, variability measures)
+- Visualization of ARL performance across methods and censoring levels
+
+## Visualization
+
+The final plot shows:
+
+- ARL as a function of process shift (Δ)
+- Comparison of methods across censoring levels
+- Uncertainty bands (interquartile range)
+
+## Key Assumptions
+
+- Data are normally distributed on the transformed scale
+- Censoring is left-censoring at a fixed LOD
+- Phase I and Phase II processes share the same underlying distribution except for introduced shifts
+
+## Dependencies
+
+- `NADA`
+- `survival`
+- `qcr`
+- `ggplot2`
+- `dplyr`
+- `sn`
+
+## Purpose
+
+This code is intended for methodological research on:
+- Handling censored microbiological data
+- Robust estimation of process parameters
+- SPC performance under censoring
+- Comparison of classical and likelihood-based monitoring methods
