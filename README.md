@@ -1,8 +1,6 @@
-# Censored Data Simulation Framework for SPC, CUSUM, and Estimator Performance
+# Censored Data Simulation Framework for Estimator and CUSUM performance
 
-This repository contains an R-based simulation framework developed for a master’s thesis on statistical methods for censored data. The code evaluates both estimation accuracy and statistical process control (SPC) performance under varying levels of left-censoring.
-
-The focus is on applications in pharmaceutical, microbiological, and environmental data, where observations fall below a limit of detection (LOD).
+This repository contains the R files for the simulations. The code evaluates both estimation accuracy and CUSUM control charts performance under varying levels of left-censoring.
 
 ---
 
@@ -11,14 +9,12 @@ The focus is on applications in pharmaceutical, microbiological, and environment
 The simulation study evaluates how different approaches for handling censored observations affect:
 
 - Phase I estimation of process parameters (mean and standard deviation)
-- Bias and RMSE of estimators under censoring
 - Phase II CUSUM monitoring performance
-- Robustness of classical vs likelihood-based methods
-
+- 
 Two main simulation components are included:
 
 1. Estimator comparison study (Bias & RMSE analysis)
-2. CUSUM / SPC performance study (ARL analysis)
+2. CUSUM performance study (ARL analysis)
 
 ---
 
@@ -42,7 +38,7 @@ Two main simulation components are included:
 - Imputation-based methods:
   - LOD substitution
   - LOD / √2 substitution
-  - Stochastic truncated normal imputation
+  -  Random stochastic imputation
 
 ---
 
@@ -76,9 +72,8 @@ Two main simulation components are included:
 
 The simulation evaluates:
 
-- Bias of mean estimators
-- Bias of standard deviation estimators
-- RMSE of all methods
+- Bias and RMSE of mean estimators
+- Bias and RMSE of standard deviation estimators
 
 Methods compared:
 - MLE
@@ -104,36 +99,6 @@ across:
 
 ---
 
-## Key assumptions
-
-- Data are normally distributed on latent scale
-- Censoring is left censoring at fixed LOD
-- Phase I and Phase II share identical parameters unless a shift is introduced
-- Censoring is non-informative
-
----
-
-## Important methodological notes
-
-- ROS is applied on observed censored data (no log transform unless explicitly stated)
-- MLE assumes Gaussian censored likelihood
-- KM is used for survival-based estimation
-- Substitution methods become unstable at high censoring levels (≥85%)
-- Likelihood-based CUSUM does not require imputation
-
----
-
-## Outputs generated
-
-- Bias tables
-- RMSE tables
-- ARL summary tables
-- Plots:
-  - Bias vs censoring
-  - RMSE vs censoring
-  - ARL vs shift
-
----
 
 ## Dependencies
 
@@ -150,8 +115,6 @@ across:
 
 This code supports methodological research on:
 
-- Censored data inference
-- Robust estimation under LOD constraints
 - SPC monitoring under incomplete data
 - Comparison of classical vs likelihood-based approaches
 - Performance evaluation of CUSUM under censoring
